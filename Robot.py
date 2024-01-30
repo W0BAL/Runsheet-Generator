@@ -9,6 +9,8 @@ import logging
 import glob
 import tkinter as tk
 from tkinter import filedialog
+
+import logging
 logging.basicConfig(level=logging.DEBUG, filename="script_log.log", filemode="w", format='%(levelname)s - %(message)s')
 
  
@@ -276,43 +278,25 @@ def populate_runsheet(ws, col, day_name, use_initials=False):
     set_column_widths(ws)   
 
  
- 
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
+root = tk.Tk()
+root.withdraw()  # Hide the root window
+roster_file_path = filedialog.askopenfilename(title="Select the Roster File", filetypes=[("Excel Files", "*.xls;*.xlsx")])
 
-root = tk.Tk()  # create a tkinter root window
-root.withdraw()  # hide the root window
-roster_file_path = filedialog.askopenfilename(title="Select the Roster File", filetypes=[("Excel Files", "*.xls;*.xlsx")])  # Open a file dialog and get the path
 if not roster_file_path:
     raise FileNotFoundError("No file was selected")
 
+print("Selected file:", roster_file_path)  # Debug print to confirm file selection
 
-
-current_directory = os.path.dirname(os.path.abspath(__file__))
-file_list = glob.glob(os.path.join(current_directory, "roster.*"))
-roster_file_path = None
-for file in file_list:
-    if file.endswith('.xls'):
-        roster_file_path = file
-        break
-    elif file.endswith('.xlsx'):
-        roster_file_path = file
-        break
-
-if roster_file_path is None:
-    raise FileNotFoundError("Neither 'roster.xls' nor 'roster.xlsx' was found")
-
-
- 
-
-# Convert xls to xlsx (only if necessary)
-
+# Convert .xls to .xlsx if necessary
 if roster_file_path.endswith('.xls'):
-    # Convert xls to xlsx
     df = pd.read_excel(roster_file_path)
     new_file_path = roster_file_path[:-4] + ".xlsx"  # Name for the converted file
-    df.to_excel(new_file_path, index=False)  # Save with the .xlsx extension
-    os.remove(roster_file_path)  # Delete the original .xls file
-    roster_file_path = new_file_path  # Update the path to the new xlsx file
+    df.to_excel(new_file_path, index=False)  # Save as .xlsx
+    os.remove(roster_file_path)  # Remove the original .xls file
+    roster_file_path = new_file_path  # Update the path to use the new .xlsx file
+
 
  
 
